@@ -203,7 +203,8 @@ body {
   letter-spacing: 0.5px;
 }
 
-.filter-group select {
+.filter-group select,
+.filter-group input {
   background: rgb(255, 255, 255);
   border: 1.5px solid var(--border-color);
   color: var(--text-main);
@@ -216,7 +217,8 @@ body {
   transition: 0.2s;
 }
 
-.filter-group select:focus {
+.filter-group select:focus,
+.filter-group input:focus {
   border-color: var(--primary-blue);
 }
 
@@ -782,7 +784,8 @@ body {
     margin-bottom: 0.1rem !important;
   }
 
-  .filter-group select {
+  .filter-group select,
+  .filter-group input {
     width: 100% !important;
     padding: 0.75rem 1rem !important;
     font-size: 0.9rem !important;

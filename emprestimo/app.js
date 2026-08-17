@@ -405,9 +405,9 @@ function initDashboard() {
   const mainEl  = document.getElementById('dashboard-view');
   mainEl.classList.remove('hidden');
 
-  // Populate sala filter
-  const selSala = document.getElementById('filter-sala');
-  SALAS.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; selSala.appendChild(o); });
+  // Populate sala filter (datalist — permite digitar/pesquisar, não só selecionar)
+  const salasDatalist = document.getElementById('filter-salas-list');
+  SALAS.forEach(s => { const o=document.createElement('option'); o.value=s; salasDatalist.appendChild(o); });
 
   // Populate categories initially
   loadCategories();
@@ -433,7 +433,7 @@ function initDashboard() {
     selectCategoryTab(e.target.value);
   });
   document.getElementById('filter-local').addEventListener('change',  applyFilters);
-  document.getElementById('filter-sala').addEventListener('change',   applyFilters);
+  document.getElementById('filter-sala').addEventListener('input',    applyFilters);
 
   // Click summary cards to filter
   document.querySelectorAll('.status-summary .stat-item').forEach(item => {
@@ -787,9 +787,17 @@ function setupERDestinoToggle() {
           <select id="er-sala" class="form-control" required>
             <option value="">Selecione a sala...</option>
             ${SALAS.map(s => `<option value="${s}">${s}</option>`).join('')}
+            <option value="__outra__">✏️ Outro local (digitar)...</option>
           </select>
+          <input type="text" id="er-sala-outra" class="form-control hidden" placeholder="Digite o local do empréstimo..." style="margin-top:0.5rem;">
         </div>
       `;
+      const selSala = document.getElementById('er-sala');
+      const inputOutra = document.getElementById('er-sala-outra');
+      selSala.addEventListener('change', () => {
+        inputOutra.classList.toggle('hidden', selSala.value !== '__outra__');
+        if (selSala.value === '__outra__') inputOutra.focus();
+      });
     } else if (tipo === 'cedido') {
       funcLabel.style.borderColor = 'var(--primary-blue)';
       dynFields.innerHTML = `
@@ -925,8 +933,9 @@ function setupEmprestimoRapidoForm() {
     let extraFields = {};
 
     if (destino === 'sala') {
-      const sala = document.getElementById('er-sala')?.value;
-      if (!sala) { alert('Selecione a sala.'); return; }
+      let sala = document.getElementById('er-sala')?.value;
+      if (sala === '__outra__') sala = document.getElementById('er-sala-outra')?.value.trim();
+      if (!sala) { alert('Selecione ou digite a sala.'); return; }
       extraFields = { status: 'emprestado', sala, local: 'T.I.' };
     } else if (destino === 'cedido') {
       const funcionario = document.getElementById('er-funcionario')?.value.trim();
@@ -1005,7 +1014,7 @@ function applyFilters() {
   const st  = document.getElementById('filter-status').value;
   const cat = document.getElementById('filter-categoria').value;
   const loc = document.getElementById('filter-local').value;
-  const sa  = document.getElementById('filter-sala').value;
+  const sa  = document.getElementById('filter-sala').value.trim() || 'Todos';
   const filtered = notebooksDB.filter(n => {
     if (s && !n.id.toLowerCase().includes(s)) return false;
     
