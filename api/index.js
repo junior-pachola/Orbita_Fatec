@@ -70,6 +70,7 @@ const rotasMatriculas = require('../src/rotas/matriculas');
 const rotasProcessos = require('../src/rotas/processos');
 const rotasOrcamento = require('../src/rotas/orcamento');
 const rotasAvaliacaoDocente = require('../src/rotas/avaliacao-docente');
+const rotasGastoTi = require('../src/rotas/gasto-ti');
 
 app.use('/api/emprestimos', rotasEmprestimo);
 app.use('/api/usuarios', rotasUsuarios);
@@ -89,6 +90,7 @@ app.use('/api/matriculas', rotasMatriculas);
 app.use('/api/processos', rotasProcessos);
 app.use('/api/orcamento', rotasOrcamento);
 app.use('/api/avaliacao-docente', rotasAvaliacaoDocente);
+app.use('/api/gasto-ti', rotasGastoTi);
 
 // Exportação obrigatória para o Vercel Serverless
 

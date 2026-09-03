@@ -1,0 +1,142 @@
+/* ==========================================
+   Gasto T.I. — Gestão de T.I.
+   Segue o padrão visual institucional do Órbita.
+   ========================================== */
+:root {
+  --primary-blue: #0F4EB8;
+  --primary-blue-d: #0c3d91;
+  --text-main: #0B1F33;
+  --text-secondary: #6a7a84;
+  --linha: #dde5e9;
+  --card: #ffffff;
+  --danger: #C0554A;
+  --alerta: #b8790f;
+}
+
+.gti-content { font-family: 'Source Sans 3', system-ui, sans-serif; color: var(--text-main); }
+.gti-content h1, .gti-content h2, .gti-content .btn-primary, .gti-content .btn-secondary,
+.gti-content label { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .9rem; }
+.page-title { font-size: 1.45rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.01em; }
+.page-subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 2px; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--primary-blue); color: #fff; border: none; border-radius: 10px;
+  padding: 10px 18px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background .15s;
+}
+.btn-primary:hover { background: var(--primary-blue-d); }
+.btn-secondary {
+  background: #fff; border: 1px solid var(--linha); color: #41525b;
+  border-radius: 10px; padding: 10px 18px; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+}
+.btn-secondary:hover { border-color: var(--primary-blue); }
+
+.gti-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.gti-kpi {
+  background: var(--card); border: 1px solid var(--linha); border-radius: 12px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;
+}
+.gti-kpi b { font-size: 1.3rem; font-weight: 800; color: var(--text-main); }
+.gti-kpi span { font-size: 0.78rem; color: var(--text-secondary); }
+.gti-kpi-alerta b { color: var(--danger); }
+
+.filters-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.search-wrap { position: relative; flex: 1; min-width: 220px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+.search-input {
+  width: 100%; box-sizing: border-box; border: 1px solid var(--linha); border-radius: 10px;
+  padding: 10px 12px 10px 38px; font-size: 14px; font-family: 'Source Sans 3', sans-serif;
+}
+.select-filtro {
+  border: 1px solid var(--linha); border-radius: 10px; padding: 9px 12px;
+  font-size: 14px; font-family: 'Source Sans 3', sans-serif; color: var(--text-main); background: #fff;
+}
+
+.gti-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 40px 0; color: var(--text-secondary); }
+
+.gti-card { background: var(--card); border: 1px solid var(--linha); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow: hidden; }
+.gti-card-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.gti-card-nome { font-size: 15px; font-weight: 700; color: var(--text-main); }
+.gti-card-tipo {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--primary-blue); background: #eaf1fb; border-radius: 999px; padding: 3px 9px; white-space: nowrap;
+}
+.gti-card-desc { font-size: 13px; color: var(--text-secondary); overflow-wrap: anywhere; word-break: break-word; }
+
+.gti-card-valores { display: flex; gap: 18px; margin-top: 2px; }
+.gti-card-valores div { display: flex; flex-direction: column; gap: 1px; }
+.gti-card-valores span { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .03em; }
+.gti-card-valores b { font-size: 14px; color: var(--text-main); }
+
+.gti-card-venc { margin-top: 2px; }
+.badge-venc {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700;
+  border-radius: 999px; padding: 3px 9px; width: fit-content;
+}
+.badge-venc-ok { color: var(--text-secondary); background: #f1f5f9; }
+.badge-venc-pago { color: #0a7d4b; background: #e3f7ed; }
+.badge-venc-vencendo { color: var(--alerta); background: #fbf1e2; }
+.badge-venc-vencido { color: var(--danger); background: #fbecea; }
+
+.gti-hint { display: block; font-size: 11.5px; font-weight: 400; color: var(--text-secondary); margin-top: 4px; }
+
+.gti-toggle { display: flex; border: 1px solid var(--linha); border-radius: 9px; overflow: hidden; }
+.gti-toggle-btn {
+  flex: 1; border: none; background: #fff; color: var(--text-secondary);
+  padding: 9px 12px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif; transition: background .15s, color .15s;
+}
+.gti-toggle-btn + .gti-toggle-btn { border-left: 1px solid var(--linha); }
+.gti-toggle-btn.active { background: var(--primary-blue); color: #fff; }
+
+.gti-card-actions { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.gti-card-actions button {
+  border: 1px solid var(--linha); background: #fff; border-radius: 8px; padding: 7px 11px;
+  font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.gti-card-actions button:hover { border-color: var(--primary-blue); }
+.gti-card-actions .btn-excluir:hover { border-color: var(--danger); color: var(--danger); }
+.gti-card-actions .btn-lancar { background: var(--primary-blue); color: #fff; border-color: var(--primary-blue); }
+.gti-card-actions .btn-lancar:hover { background: var(--primary-blue-d); }
+
+/* Modais (padrão Órbita) */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(11,31,51,.45);
+  display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; transition: opacity .2s;
+}
+.modal-overlay.hidden { opacity: 0; pointer-events: none; }
+.modal-content { background: #fff; border-radius: 16px; padding: 26px 28px; width: 100%; max-width: 460px; box-shadow: 0 18px 48px rgba(11,31,51,.25); }
+.modal-content h2 { color: var(--text-main); font-size: 18px; margin: 0 0 18px; }
+.gti-lanc-gasto-nome { font-size: 13px; color: var(--text-secondary); margin: -12px 0 16px; font-weight: 600; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; box-sizing: border-box; border: 1px solid var(--linha); border-radius: 9px;
+  padding: 9px 12px; font-family: 'Source Sans 3', sans-serif; font-size: 14.5px; color: var(--text-main);
+}
+.form-group textarea { resize: vertical; }
+.rev-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+.historico-lista { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.hist-row { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--linha); color: var(--text-main); }
+.hist-row:last-child { border-bottom: none; }
+.hist-obs { font-size: 12px; color: var(--text-secondary); font-style: italic; margin-top: 2px; }
+.hist-vazio { font-size: 13px; color: var(--text-secondary); font-style: italic; text-align: center; padding: 14px 0; }
+
+.toast {
+  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
+  background: var(--text-main); color: #fff; padding: 12px 20px; border-radius: 11px;
+  font-size: 14px; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+  z-index: 60; box-shadow: 0 8px 24px rgba(11,31,51,.28); transition: opacity .25s, transform .25s;
+}
+.toast.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(16px); }
+.toast.toast-error { background: #8a2f26; }
+
+.hide-execute .action-execute { display: none !important; }
+
+@media (max-width: 600px) { .rev-grid2 { grid-template-columns: 1fr; } }

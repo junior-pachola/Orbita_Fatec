@@ -140,6 +140,16 @@ body {
   flex-shrink: 0;
 }
 
+.layout-nav-badge {
+  margin-left: auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.35);
+  flex-shrink: 0;
+}
+
 .layout-nav-category {
   font-size: 0.65rem;
   font-weight: 800;
