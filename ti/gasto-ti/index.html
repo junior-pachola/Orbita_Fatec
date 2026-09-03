@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gasto T.I. - Órbita FATEC</title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/core/layout.css">
+    <link rel="stylesheet" href="/ti/gasto-ti/gasto-ti.css">
+</head>
+<body>
+    <div id="auth-guard" class="layout-auth-guard">
+        <div class="layout-spinner"></div>
+        <h3 style="color:var(--text-main); font-weight:600;">Autenticando...</h3>
+    </div>
+
+    <div id="app" class="layout-wrapper hidden">
+        <main class="layout-main">
+            <div class="layout-content gti-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Gasto T.I.</h1>
+                        <p class="page-subtitle">Assinaturas, licenças e despesas do setor de T.I.</p>
+                    </div>
+                    <div class="page-header-actions">
+                        <button class="btn-primary action-execute" id="btn-novo-gasto">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Novo Gasto
+                        </button>
+                    </div>
+                </div>
+
+                <div class="gti-kpis">
+                    <div class="gti-kpi"><b id="kpi-total">R$ 0,00</b><span>Total acumulado</span></div>
+                    <div class="gti-kpi"><b id="kpi-qtd">0</b><span>Gastos cadastrados</span></div>
+                    <div class="gti-kpi gti-kpi-alerta"><b id="kpi-vencidos">0</b><span>Vencidos</span></div>
+                </div>
+
+                <div class="filters-bar">
+                    <div class="search-wrap">
+                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="search-gastos" class="search-input" placeholder="Buscar por nome ou descrição...">
+                    </div>
+                    <select id="filtro-tipo" class="select-filtro">
+                        <option value="">Todos os tipos</option>
+                        <option value="mensal">Mensal</option>
+                        <option value="unico">Único</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+
+                <div id="gastos-list">
+                    <div class="empty-state"><p>Carregando gastos...</p></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Novo/Editar Gasto -->
+    <div id="modal-gasto" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="modal-gasto-title">Novo Gasto</h2>
+            <form id="form-gasto">
+                <input type="hidden" id="gti-id">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="gti-nome" placeholder="Ex: Licença Office 365, Servidor Cloud" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="gti-descricao" rows="2" placeholder="Detalhes sobre esse gasto"></textarea>
+                </div>
+                <div class="rev-grid2">
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select id="gti-tipo" required>
+                            <option value="mensal">Mensal</option>
+                            <option value="unico">Único</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor de referência (R$) *</label>
+                        <input type="number" id="gti-valor" min="0.01" step="0.01" placeholder="0,00" required>
+                        <span class="gti-hint">Fixo (ex: VPS) ou só uma estimativa, se o valor variar todo mês (ex: Firebase)</span>
+                    </div>
+                </div>
+                <div class="form-group" id="grupo-dia-vencimento">
+                    <label>Dia do vencimento (todo mês) *</label>
+                    <input type="number" id="gti-dia-vencimento" min="1" max="31" placeholder="Ex: 5">
+                    <span class="gti-hint">Dia fixo do mês em que essa conta vence, de 1 a 31</span>
+                </div>
+                <div class="form-group" id="grupo-valor-fixo">
+                    <label>Esse valor é fixo todo mês? *</label>
+                    <div class="gti-toggle" id="gti-valor-fixo-toggle">
+                        <button type="button" class="gti-toggle-btn active" data-valor="true">Fixo</button>
+                        <button type="button" class="gti-toggle-btn" data-valor="false">Variável</button>
+                    </div>
+                    <input type="hidden" id="gti-valor-fixo" value="true">
+                    <span class="gti-hint" id="gti-valor-fixo-hint">Fixo (ex: VPS): assim que vencer, lança sozinho repetindo o valor de referência. Variável (ex: Firebase): fica em branco até você lançar o valor real do mês.</span>
+                </div>
+                <div class="form-group hidden" id="grupo-data-vencimento">
+                    <label>Data de vencimento</label>
+                    <input type="date" id="gti-vencimento">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btn-cancelar-gasto">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btn-salvar-gasto">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Lançar valor mensal -->
+    <div id="modal-lancamento" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Lançar novo valor</h2>
+            <p class="gti-lanc-gasto-nome" id="lanc-gasto-nome"></p>
+            <form id="form-lancamento">
+                <input type="hidden" id="lanc-gasto-id">
+                <div class="form-group">
+                    <label>Valor gasto neste mês (R$) *</label>
+                    <input type="number" id="lanc-valor" min="0" step="0.01" placeholder="0,00" required>
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea id="lanc-observacoes" rows="2" placeholder="Notas sobre esse lançamento"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btn-cancelar-lancamento">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btn-salvar-lancamento">Lançar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Histórico de lançamentos -->
+    <div id="modal-historico" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Histórico de lançamentos</h2>
+            <div id="historico-lista" class="historico-lista"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="btn-fechar-historico">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="/ti/gasto-ti/app.js"></script>
+</body>
+</html>

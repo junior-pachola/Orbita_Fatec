@@ -79,6 +79,7 @@ export function setupLayout(user, role, activeModuleId, onLogout) {
     const link = document.createElement('a');
     link.href = mod.url;
     link.className = `layout-nav-item ${mod.id === activeModuleId ? 'active' : ''}`;
+    link.dataset.modId = mod.id;
     link.innerHTML = `${mod.icon} <span>${mod.title}</span>`;
     nav.appendChild(link);
   });
@@ -119,6 +120,7 @@ export function setupLayout(user, role, activeModuleId, onLogout) {
         const link = document.createElement('a');
         link.href = mod.url;
         link.className = `layout-nav-item ${mod.id === activeModuleId ? 'active' : ''}`;
+        link.dataset.modId = mod.id;
         link.innerHTML = `${mod.icon} <span>${mod.title}</span>`;
         group.appendChild(link);
       });
@@ -254,10 +256,33 @@ export function setupLayout(user, role, activeModuleId, onLogout) {
     ? `http://${window.location.hostname}:3000/api`
     : '/api';
 
+  // Indicador de notificação (círculo vermelho) no menu: hoje só o módulo
+  // Gasto T.I. usa isso, pra sinalizar gasto(s) com vencimento já passado.
+  // Fica num mapa pra ficar fácil plugar outros módulos no futuro.
+  const NOTIFICATION_ENDPOINTS = {
+    'gasto-ti': '/gasto-ti/itens/alertas'
+  };
+
   if (token) {
     const authHeaders = { 'Authorization': `Bearer ${token}` };
     const fetchJson = (url) => fetch(url, { headers: authHeaders })
       .then(res => { if (res.ok) return res.json(); throw new Error(); });
+
+    Object.entries(NOTIFICATION_ENDPOINTS).forEach(([modId, endpoint]) => {
+      if (!podeVerModulo(modId)) return;
+      fetchJson(`${API_BASE}${endpoint}`)
+        .then(data => {
+          if (!data || !data.total) return;
+          const link = sidebar.querySelector(`.layout-nav-item[data-mod-id="${modId}"]`);
+          if (link && !link.querySelector('.layout-nav-badge')) {
+            const dot = document.createElement('span');
+            dot.className = 'layout-nav-badge';
+            dot.title = 'Há pendências neste módulo';
+            link.appendChild(dot);
+          }
+        })
+        .catch(() => {});
+    });
 
     const promMe = fetchJson(`${API_BASE}/usuarios/me`);
     const promPerms = role !== 'adm_l1'
