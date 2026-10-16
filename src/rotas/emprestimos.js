@@ -15,8 +15,8 @@ let cacheLista = { dados: null, lidoEm: 0 };
 
 const ordenarPorId = (lista) => lista.sort((a, b) => a.id.localeCompare(b.id));
 
-async function lerLista() {
-    if (cacheLista.dados && (Date.now() - cacheLista.lidoEm) < CACHE_TTL) {
+async function lerLista(forcarFresh = false) {
+    if (!forcarFresh && cacheLista.dados && (Date.now() - cacheLista.lidoEm) < CACHE_TTL) {
         return cacheLista.dados;
     }
     const snapshot = await db.collection('notebooks').get();
@@ -44,9 +44,14 @@ function removerDoCache(id) {
 }
 
 // GET /api/emprestimos - Retorna todos os notebooks
+// ?fresh=1 ignora o cache em memória — usado pela tela logo depois de uma
+// escrita (devolver/cadastrar/etc), porque na Vercel o PUT pode ter sido
+// atendido por uma instância serverless diferente da que atende este GET;
+// cada instância tem seu próprio cache, então sem isso a tela podia mostrar
+// o item como se nada tivesse mudado até o cache dessa instância expirar.
 router.get('/', verifyToken, verifyToken.requireModulePermission('emprestimo'), async (req, res) => {
     try {
-        res.json(await lerLista());
+        res.json(await lerLista(req.query.fresh === '1'));
     } catch (error) {
         console.error('Erro ao buscar empréstimos:', error);
         res.status(500).json({ error: 'Erro ao buscar dados.' });

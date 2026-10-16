@@ -110,12 +110,17 @@ function loadCategories() {
     }
   });
   
-  // Garante que "Notebook" seja a primeira categoria, e remove qualquer residual de "Outros"
+  // Remove qualquer residual de "Outros"
   categorias = merged.filter(c => c.toLowerCase() !== 'outros' && c.toLowerCase() !== 'outro');
-  // Se por algum motivo 'Notebook' não estiver na lista, adiciona no início
-  if (!categorias.some(c => c.toLowerCase() === 'notebook')) {
-    categorias.unshift('Notebook');
-  }
+
+  // As categorias eram listadas na ordem em que foram descobertas/criadas,
+  // o que deixava as abas e as seções do grid fora de ordem conforme iam
+  // surgindo novos tipos de item. Agora ficam em ordem alfabética — com
+  // "Notebook" sempre primeiro, por ser o item mais comum.
+  categorias = categorias
+    .filter(c => c.toLowerCase() !== 'notebook')
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  categorias.unshift('Notebook');
 }
 
 function saveCategories() {
@@ -460,14 +465,25 @@ onAuthStateChanged(auth, async (user) => {
 // ================================================================
 //  DATA LOADING
 // ================================================================
-async function loadNotebooks() {
+async function loadNotebooks(fresh = false) {
   try {
-    notebooksDB = await apiFetch('/emprestimos');
+    notebooksDB = await apiFetch(`/emprestimos${fresh ? '?fresh=1' : ''}`);
     // Normaliza itens legados (sem tipo, 'Outros', 'outro', 'notbooks', etc.) para 'Notebook'
     notebooksDB.forEach(n => {
       if (!n.tipo || n.tipo.trim() === '' || n.tipo.toLowerCase() === 'outros' || n.tipo.toLowerCase() === 'outro' || n.tipo.toLowerCase() === 'notbooks' || n.tipo.toLowerCase() === 'notbook') {
         n.tipo = 'Notebook';
       }
+    });
+    // Encaixa o tipo na grafia exata de uma categoria já conhecida (ex.:
+    // "passador"/"Passador " salvo com case ou espaço diferente do cadastro
+    // "Passador"). Sem isso, o filtro por categoria (comparação exata mais
+    // abaixo) deixava alguns itens de fora da aba certa, e o agrupamento do
+    // grid abria uma seção extra duplicada (uma "Passador", outra "passador")
+    // em vez de juntar tudo numa seção só.
+    notebooksDB.forEach(n => {
+      const bruto = (n.tipo || '').trim();
+      const match = categorias.find(c => c.toLowerCase() === bruto.toLowerCase());
+      n.tipo = match || bruto;
     });
 
     if (isDashboard) {
@@ -574,9 +590,9 @@ function initDashboard() {
       });
       
       fecharCadastro();
-      
-      // Recarregar itens e atualizar grid
-      await loadNotebooks();
+
+      // Recarregar itens e atualizar grid (fresh: acabamos de escrever)
+      await loadNotebooks(true);
       applyFilters();
     } catch (err) {
       console.error(err);
@@ -640,7 +656,7 @@ function initDashboard() {
         devolverGrupoBtn.textContent = originalText;
         devolverGrupoBtn.disabled = false;
       }
-      await loadNotebooks();
+      await loadNotebooks(true);
       applyFilters();
       return;
     }
@@ -662,7 +678,7 @@ function initDashboard() {
       devolverBtn.disabled = true;
       try {
         await devolverItem(note, local);
-        await loadNotebooks();
+        await loadNotebooks(true);
         applyFilters();
       } catch (err) {
         console.error(err);
@@ -1179,7 +1195,7 @@ function setupEmprestimoRapidoForm() {
       }
 
       window.fecharEmprestimoRapido();
-      await loadNotebooks();
+      await loadNotebooks(true);
       applyFilters();
 
       // Show success feedback
@@ -1202,7 +1218,7 @@ function setupEmprestimoRapidoForm() {
       console.error(err);
       const parcial = salvos.length ? `\n\nJá foram emprestados: ${salvos.join(', ')}` : '';
       alert('Erro ao processar Empréstimo Rápido: ' + err.message + parcial);
-      if (salvos.length) { await loadNotebooks(); applyFilters(); }
+      if (salvos.length) { await loadNotebooks(true); applyFilters(); }
     } finally {
       if (submitText) submitText.textContent = '⚡ Emprestar';
       if (submitBtn) submitBtn.disabled = false;
